@@ -50,6 +50,9 @@ extern "C" {
   }
 }
 
+// External PDM Microphone pins
+#define PDM_DATA_PIN 4
+#define PDM_CLK_PIN 3
 
 PDMClass::PDMClass(int dinPin, int clkPin, int pwrPin) :
   _dinPin(dinPin),
@@ -116,6 +119,7 @@ int PDMClass::begin(int channels, int sampleRate)
   if(pio_can_add_program(pio, &pdm_pio_program)) {
     offset = pio_add_program(pio, &pdm_pio_program);
     pdm_pio_program_init(pio, sm, offset, _clkPin, _dinPin, clkDiv);
+    // pdm_pio_program_init(pio, sm, offset, PDM_CLK_PIN, PDM_DATA_PIN, clkDiv);
   } else {
     printf("Cannot load pio program\n");
     return 0;
@@ -240,4 +244,8 @@ void PDMClass::IrqHandler(bool halftranfer)
   }
 }
 
-PDMClass PDM(22, 23, -1);
+// This is the default for an RP2040 with a PDM microphone builtin
+// PDMClass PDM(22, 23, -1);
+
+// This is the external pin definition for a PDM microphone
+PDMClass PDM(PDM_DATA_PIN, PDM_CLK_PIN, -1);
