@@ -50,8 +50,8 @@ extern "C" {
   }
 }
 
-// External PDM Microphone pins
-#define PDM_DATA_PIN 4
+// External PDM Microphone pins - Arduino RP2040: data 2, clk 3; Seeed XIAO RP2040: data 4, clk 3; Arduino RP2040 Connect: data 22, clk 23
+#define PDM_DATA_PIN 2
 #define PDM_CLK_PIN 3
 
 PDMClass::PDMClass(int dinPin, int clkPin, int pwrPin) :
