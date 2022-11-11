@@ -146,6 +146,7 @@ list(APPEND SOURCE_FILES ${PORTING_FILES})
 list(APPEND SOURCE_FILES ${FIRMWARE_SDK_FILES})
 list(APPEND SOURCE_FILES ${THIRDPARTY_FILES})
 list(APPEND SOURCE_FILES ${MIC_FILES})
+list(APPEND SOURCE_FILES src/user_logic.cpp)
 
 # add all sources to the project
 target_sources(ei_rp2040_firmware PRIVATE ${SOURCE_FILES})
