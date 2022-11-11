@@ -89,7 +89,7 @@ void ei_run_impulse(void)
         case INFERENCE_DATA_READY:
             user_inference_data_ready();
         default:
-            user_inference_defualt();
+            user_inference_default();
             break;
     }
 
