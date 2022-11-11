@@ -11,4 +11,6 @@
 #define PDM_DATA_PIN 2
 #define PDM_CLK_PIN 3
 
+#define INFERENCE_WAITING_TIMEOUT 2000
+
 #endif
