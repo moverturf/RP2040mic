@@ -30,6 +30,7 @@
 #include "ei_microphone.h"
 #include "ei_device_raspberry_rp2040.h"
 #include "ei_run_impulse.h"
+#include "user_logic.h"
 
 typedef enum {
     INFERENCE_STOPPED,
@@ -41,7 +42,6 @@ typedef enum {
 static int print_results;
 static uint16_t samples_per_inference;
 static inference_state_t state = INFERENCE_STOPPED;
-static bool listening = false;
 static uint64_t last_inference_ts = 0;
 static bool continuous_mode = false;
 static bool debug_mode = false;
@@ -50,41 +50,12 @@ static int samples_wr_index = 0;
 
 static void timing_and_classification(ei_impulse_result_t* result)
 {
-    ei_printf("Predictions (DSP: %d ms., Classification: %d ms., Anomaly: %d ms.): \n",
-        result->timing.dsp, result->timing.classification, result->timing.anomaly);
-    for (size_t ix = 0; ix < EI_CLASSIFIER_LABEL_COUNT; ix++) {
-        ei_printf("    %s: \t", result->classification[ix].label);
-        ei_printf_float(result->classification[ix].value);
-        ei_printf("\r\n");
-    }
-#if EI_CLASSIFIER_HAS_ANOMALY == 1
-        ei_printf("    anomaly score: ");
-        ei_printf_float(result->anomaly);
-        ei_printf("\r\n");
-#endif
+    user_timing_and_classification(result);
 }
 
 static void display_results(ei_impulse_result_t* result)
 {
-    /*
-    if(continuous_mode == true) {
-        if(result->label_detected >= 0) {
-            ei_printf("LABEL DETECTED : %s\r\n", result->classification[result->label_detected].label);
-            timing_and_classification(result);
-        }
-        else {
-            const char spinner[] = {'/', '-', '\\', '|'};
-            static char spin = 0;
-            ei_printf("Running inference %c\r", spinner[spin]);
-
-            if(++spin >= sizeof(spinner)) {
-                spin = 0;
-            }
-        }
-    }
-    else { */
-        timing_and_classification(result);
-    /* } */
+    user_display_results(result);
 }
 
 void ei_run_impulse(void)
@@ -96,23 +67,18 @@ void ei_run_impulse(void)
     switch(state) {
         case INFERENCE_STOPPED:
             // nothing to do
-            ei_printf("INFERENCE_STOPPED....\n");
+            user_inference_stopped();
             return;
         case INFERENCE_WAITING:
-            if(ei_read_timer_ms() < (last_inference_ts + 2000)) {
+            if(ei_read_timer_ms() < (last_inference_ts + INFERENCE_WAITING_TIMEOUT)) {
                 return;
             }
-            if(!listening) {
-                dev->set_led(true);
-                ei_printf("Listening....\n");
-                listening = true;
-            }
-            ei_printf("INFERENCE_WAITING....\n");
+            user_inference_waiting();
             state = INFERENCE_SAMPLING;
             ei_microphone_inference_reset_buffers();
             break;
         case INFERENCE_SAMPLING:
-            ei_printf("INFERENCE_SAMPLING....\n");
+            user_inference_sampling();
              // wait for data to be collected through callback
             if (ei_microphone_inference_is_recording()) {
                 return;
@@ -121,8 +87,9 @@ void ei_run_impulse(void)
             break;
             // nothing to do, just continue to inference provcessing below
         case INFERENCE_DATA_READY:
+            user_inference_data_ready();
         default:
-            ei_printf("default state....\n");
+            user_inference_defualt();
             break;
     }
 
@@ -148,16 +115,13 @@ void ei_run_impulse(void)
     if(continuous_mode == true) {
         if(++print_results >= (EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW >> 1)) {
             display_results(&result);
+            run_user_logic_after_inference(&result);
             print_results = 0;
         }
     }
     else {
         display_results(&result);
-        if(result.classification[0].value > 0.50F) {
-            dev->set_led(false);
-            ei_printf("Bark detected...\n");
-            listening = false;
-        }
+        run_user_logic_after_inference(&result);
     }
 
 
@@ -165,7 +129,7 @@ void ei_run_impulse(void)
         state = INFERENCE_SAMPLING;
     }
     else {
-        ei_printf("Starting inferencing in 2 seconds...\n");
+        ei_printf("Starting inferencing in %f seconds...\n", INFERENCE_WAITING_TIMEOUT / 1000);
         last_inference_ts = ei_read_timer_ms();
         state = INFERENCE_WAITING;
     }
@@ -201,7 +165,7 @@ void ei_start_impulse(bool continuous, bool debug, bool use_max_uart_speed)
     else {
         samples_per_inference = EI_CLASSIFIER_RAW_SAMPLE_COUNT * EI_CLASSIFIER_RAW_SAMPLES_PER_FRAME;
         // it's time to prepare for sampling
-        ei_printf("Starting inferencing in 2 seconds...\n");
+        ei_printf("Starting inferencing in %f seconds...\n", INFERENCE_WAITING_TIMEOUT / 1000);
         last_inference_ts = ei_read_timer_ms();
         state = INFERENCE_WAITING;
     }

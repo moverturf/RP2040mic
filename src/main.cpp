@@ -42,6 +42,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "user_logic.h"
+
 EiDeviceInfo *EiDevInfo = dynamic_cast<EiDeviceInfo *>(EiDeviceRP2040::get_device());
 static ATServer *at;
 
@@ -95,7 +97,7 @@ void ei_init(void)
 
     at = ei_at_init(dev);
 
-    ei_start_impulse(false, false);
+    start_user_impulse();
 
     ei_printf("Type AT+HELP to see a list of commands.\r\n");
     at->print_prompt();
@@ -125,6 +127,7 @@ int main(void)
     gpio_put(LED_PIN, 1);
 
     stdio_init_all();
+    // Uncomment these lines if you want the device to be intereactive only.
 //    while (!tud_cdc_connected()) {
 //        tight_loop_contents();
 //    }
