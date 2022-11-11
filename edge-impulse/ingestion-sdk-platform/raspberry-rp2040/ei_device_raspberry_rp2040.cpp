@@ -85,6 +85,10 @@ EiDeviceRP2040::~EiDeviceRP2040()
 
 void EiDeviceRP2040::init_device_id(void)
 {
+    gpio_init(USER_LED_PIN);
+    gpio_set_dir(USER_LED_PIN, GPIO_OUT);
+    gpio_put(USER_LED_PIN, 0);
+
     // Setup device ID
     char temp[18];
 
@@ -159,6 +163,15 @@ void EiDeviceRP2040::set_state(EiState state)
         break;                
     default:
         EI_LED_OFF;
+    }
+}
+
+void EiDeviceRP2040::set_led(bool state)
+{
+    if(state) {
+        gpio_put(USER_LED_PIN, 1);
+    } else {
+        gpio_put(USER_LED_PIN, 0);
     }
 }
 

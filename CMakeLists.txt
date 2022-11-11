@@ -73,6 +73,7 @@ target_link_libraries(ei_rp2040_firmware
 
 target_include_directories(ei_rp2040_firmware PRIVATE
     ${MODEL_FOLDER}
+    ${MODEL_FOLDER}/include
     ${MODEL_FOLDER}/classifer
     ${MODEL_FOLDER}/tflite-model
     ${MODEL_FOLDER}/model-parameters

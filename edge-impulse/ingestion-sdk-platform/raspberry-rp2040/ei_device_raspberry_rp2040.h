@@ -28,6 +28,9 @@
 #include "ei_device_info_lib.h"
 #include "pico/stdlib.h"
 
+//Include user specific settings
+#include "user_settings.h"
+
 /** Baud rates */
 #define DEFAULT_BAUD 115200
 #define MAX_BAUD     115200
@@ -94,7 +97,7 @@ public:
     void set_state(EiState state) override;
     EiState get_state(void);
     bool get_sensor_list(const ei_device_sensor_t **sensor_list, size_t *sensor_list_size) override;
-
+    void set_led(bool state);
     void set_default_data_output_baudrate(void) override;
     void set_max_data_output_baudrate(void) override;
     uint32_t get_data_output_baudrate(void) override;

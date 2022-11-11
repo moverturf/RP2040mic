@@ -258,7 +258,7 @@ bool ei_microphone_record(uint32_t sample_length_ms, uint32_t start_delay_ms, bo
 
 bool ei_microphone_inference_start(uint32_t n_samples, float interval_ms)
 {
-
+    printf("Microphone inference start...\n");
     inference.buffers[0] = (int16_t *)ei_malloc(n_samples * sizeof(int16_t));
 
     if(inference.buffers[0] == NULL) {
@@ -318,6 +318,7 @@ bool ei_microphone_inference_start(uint32_t n_samples, float interval_ms)
  */
 bool ei_microphone_inference_record(void)
 {
+    printf("Microphone inference record...\n");
     bool ret = true;
 
     if (inference.buf_ready == 1) {
@@ -375,6 +376,7 @@ bool ei_microphone_inference_end(void)
  */
 bool ei_microphone_sample_start(void)
 {
+    printf("Microphone sample start...\n");
 
     EiDeviceRP2040* dev = static_cast<EiDeviceRP2040*>(EiDeviceInfo::get_device());
     EiDeviceMemory* mem = dev->get_memory();

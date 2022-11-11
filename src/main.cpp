@@ -94,6 +94,9 @@ void ei_init(void)
     dev->set_state(eiStateFinished);
 
     at = ei_at_init(dev);
+
+    ei_start_impulse(false, false);
+
     ei_printf("Type AT+HELP to see a list of commands.\r\n");
     at->print_prompt();
 }
@@ -122,9 +125,9 @@ int main(void)
     gpio_put(LED_PIN, 1);
 
     stdio_init_all();
-    while (!tud_cdc_connected()) {
-        tight_loop_contents();
-    }
+//    while (!tud_cdc_connected()) {
+//        tight_loop_contents();
+//    }
     
     gpio_put(LED_PIN, 0);
 

@@ -41,6 +41,7 @@ typedef enum {
 static int print_results;
 static uint16_t samples_per_inference;
 static inference_state_t state = INFERENCE_STOPPED;
+static bool listening = false;
 static uint64_t last_inference_ts = 0;
 static bool continuous_mode = false;
 static bool debug_mode = false;
@@ -65,6 +66,7 @@ static void timing_and_classification(ei_impulse_result_t* result)
 
 static void display_results(ei_impulse_result_t* result)
 {
+    /*
     if(continuous_mode == true) {
         if(result->label_detected >= 0) {
             ei_printf("LABEL DETECTED : %s\r\n", result->classification[result->label_detected].label);
@@ -80,26 +82,38 @@ static void display_results(ei_impulse_result_t* result)
             }
         }
     }
-    else {
+    else { */
         timing_and_classification(result);
-    }
+    /* } */
 }
 
 void ei_run_impulse(void)
 {
+    EiDeviceRP2040* dev = static_cast<EiDeviceRP2040*>(EiDeviceInfo::get_device());
+                // ei_printf("Listening....\n");
+                // dev->set_led(true);
+
     switch(state) {
         case INFERENCE_STOPPED:
             // nothing to do
+            ei_printf("INFERENCE_STOPPED....\n");
             return;
         case INFERENCE_WAITING:
             if(ei_read_timer_ms() < (last_inference_ts + 2000)) {
                 return;
             }
+            if(!listening) {
+                dev->set_led(true);
+                ei_printf("Listening....\n");
+                listening = true;
+            }
+            ei_printf("INFERENCE_WAITING....\n");
             state = INFERENCE_SAMPLING;
             ei_microphone_inference_reset_buffers();
             break;
         case INFERENCE_SAMPLING:
-            // wait for data to be collected through callback
+            ei_printf("INFERENCE_SAMPLING....\n");
+             // wait for data to be collected through callback
             if (ei_microphone_inference_is_recording()) {
                 return;
             }
@@ -108,6 +122,7 @@ void ei_run_impulse(void)
             // nothing to do, just continue to inference provcessing below
         case INFERENCE_DATA_READY:
         default:
+            ei_printf("default state....\n");
             break;
     }
 
@@ -138,7 +153,13 @@ void ei_run_impulse(void)
     }
     else {
         display_results(&result);
+        if(result.classification[0].value > 0.50F) {
+            dev->set_led(false);
+            ei_printf("Bark detected...\n");
+            listening = false;
+        }
     }
+
 
     if(continuous_mode == true) {
         state = INFERENCE_SAMPLING;
