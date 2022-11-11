@@ -55,7 +55,7 @@ static void timing_and_classification(ei_impulse_result_t* result)
 
 static void display_results(ei_impulse_result_t* result)
 {
-    user_display_results(result);
+    user_display_results(continuous_mode, result);
 }
 
 void ei_run_impulse(void)
