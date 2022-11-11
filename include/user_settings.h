@@ -11,5 +11,4 @@
 #define PDM_DATA_PIN 2
 #define PDM_CLK_PIN 3
 
-#define LABEL_DETECT_THRESHHOLD 0.50F
 #endif
