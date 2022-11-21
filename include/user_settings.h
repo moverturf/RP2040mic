@@ -2,7 +2,7 @@
 #define USER_SETTINGS_H
 
 // Add user project specfic settings here
-
+#define USER_DETECT_THRESHOLD 0.50F
 
 // Default setttings are for Raspberry Pi Pico RP2040
 #define USER_LED_PIN 25

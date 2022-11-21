@@ -3,7 +3,11 @@
 
 #include "ei_classifier_types.h"
 
+#include "ei_classifier_porting.h"
+
 #include "user_settings.h"
+
+#include <cstddef>
 
 void run_user_logic_after_inference(ei_impulse_result_t *result);
 
