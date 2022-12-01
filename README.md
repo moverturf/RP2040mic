@@ -10,6 +10,7 @@ Edge Impulse enables developers to create the next generation of intelligent dev
 
 - Raspberry Pi RP2040 based development boards, preferably Raspberry Pi Pico or Arduino Nano RP2040 Connect.
 - (Optional) If you are using Raspberry Pi Pico, [Grove Shield for Pi Pico](https://wiki.seeedstudio.com/Grove_Shield_for_Pi_Pico_V1.0/) makes it easier to connect external sensors for data collection/inference.
+- This version integrates a PDM Mic on pins 2 and 3 (see PDM_DATA_PIN and PDM_CLK_PIN) for purposes of sound recognition.  Make sure the sampling frequency is 16 kHz throughout the build and any subsequent models.  It was tested with Adafruit PDM breakout.
 
 ### Tools
 The below instructions assume you are using   Debian-based  Linux  distribution.  Alternative  instructions  for  those
